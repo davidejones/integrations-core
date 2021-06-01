@@ -369,6 +369,10 @@ The PostgreSQL check does not include any events.
 **postgres.can_connect**:<br>
 Returns `CRITICAL` if the Agent is unable to connect to the monitored PostgreSQL instance, otherwise returns `OK`.
 
+## Deep Database Monitoring Beta
+
+TODO
+
 ## Further Reading
 
 Additional helpful documentation, links, and articles:
