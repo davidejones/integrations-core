@@ -40,7 +40,7 @@ pg_stat_statements.track = ALL
 #### Datadog user setup
 
 <!-- xxx tabs xxx -->
-<!-- xxx tab "Postgres 9.6" xxx -->
+<!-- xxx tab "Postgres <= 9.6" xxx -->
 
 ```SQL
 CREATE USER datadog WITH password '<PASSWORD>';
@@ -65,7 +65,7 @@ SECURITY DEFINER;
 ```
 
 <!-- xxz tab xxx -->
-<!-- xxx tab "Postgres 10+" xxx -->
+<!-- xxx tab "Postgres >= 10" xxx -->
 
 ```SQL
 CREATE USER datadog WITH password '<PASSWORD>';
@@ -154,22 +154,6 @@ To configure this check for an Agent running on a host:
    ```
 
 2. [Restart the Agent][4].
-
-##### Deep Database Monitoring (beta)
-
-<div class="alert alert-warning">
-Deep Database Monitoring is currently in beta.
-</div>
-
-Datadog **Deep Database Monitoring** enables collection of Query Metrics, Samples, and Execution plans. To enable, add the `deep_database_monitoring` and `statement_samples` settings to your postgres instance configuration:
-
-```yaml
-instances:
- - host: ""
-   deep_database_monitoring: true
-   statement_samples:
-     enabled: true
-```
 
 ##### Trace collection
 
@@ -416,6 +400,22 @@ Then, [instrument your application container that makes requests to Postgres][32
 ### Validation
 
 [Run the Agent's status subcommand][9] and look for `postgres` under the Checks section.
+
+## Deep Database Monitoring (beta)
+
+<div class="alert alert-warning">
+Deep Database Monitoring is currently in beta.
+</div>
+
+Datadog **Deep Database Monitoring** enables Query Metrics, Samples, and Execution plans. To get started, add the `deep_database_monitoring` and `statement_samples` settings to your postgres instance configuration:
+
+```yaml
+instances:
+ - host: ""
+   deep_database_monitoring: true
+   statement_samples:
+     enabled: true
+```
 
 ## Data Collected
 
