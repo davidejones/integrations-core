@@ -40,7 +40,7 @@ pg_stat_statements.track = ALL
 #### Datadog user setup
 
 <!-- xxx tabs xxx -->
-<!-- xxx tab "Postgres <= 9.6" xxx -->
+<!-- xxx tab "Postgres ≤ 9.6" xxx -->
 
 ```SQL
 CREATE USER datadog WITH password '<PASSWORD>';
@@ -65,7 +65,7 @@ SECURITY DEFINER;
 ```
 
 <!-- xxz tab xxx -->
-<!-- xxx tab "Postgres >= 10" xxx -->
+<!-- xxx tab "Postgres ≥ 10" xxx -->
 
 ```SQL
 CREATE USER datadog WITH password '<PASSWORD>';
