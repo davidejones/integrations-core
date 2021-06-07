@@ -155,7 +155,11 @@ To configure this check for an Agent running on a host:
 
 2. [Restart the Agent][4].
 
-##### Deep Database Monitoring
+##### Deep Database Monitoring (beta)
+
+<div class="alert alert-warning">
+Deep Database Monitoring is currently in beta.
+</div>
 
 Datadog **Deep Database Monitoring** enables collection of Query Metrics, Samples, and Execution plans. To enable, add the `deep_database_monitoring` and `statement_samples` settings to your postgres instance configuration:
 
