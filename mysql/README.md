@@ -29,7 +29,7 @@ The MySQL check is included in the [Datadog Agent][4] package. No additional ins
 In order to collect query metrics, samples, and execution plans for [Deep Database Monitoring](#deep-database-monitoring), the [MySQL Performance Schema](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-quick-start.html) needs to be enabled. 
 
 <!-- xxx tabs xxx -->
-<!-- xxx tab "Self-hosted" -->
+<!-- xxx tab "Self-hosted" xxx -->
 
 Configure the following [Performance Schema Options](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-options.html). They can be configured on the command-line or in option files (i.e. `mysql.conf`). 
 
