@@ -77,7 +77,7 @@ Configure the following in the [DB Parameter Group](https://docs.aws.amazon.com/
 The datadog agent requires read-only access to the database in order to collect statistics and queries.
 
 <!-- xxx tabs xxx -->
-<!-- xxx tab "MySQL ≤ 5.7" -->
+<!-- xxx tab "MySQL ≤ 5.7" xxx -->
 
 For managed databases replace `localhost` with the host where your agent will be running, or `%` to allow the agent to connect from any host. For more information, see the [MySQL documentation][5].
 
