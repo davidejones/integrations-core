@@ -37,7 +37,6 @@ Configure the following [Postgres parameters](https://www.postgresql.org/docs/13
 | AWS [RDS](https://aws.amazon.com/rds/postgresql/) or [RDS Aurora](https://aws.amazon.com/rds/aurora/postgresql-features/) | [DB Parameter Group](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_WorkingWithParamGroups.html) <br/>  Note that for RDS Aurora `pg_stat_statements` is enabled by default. |
 | Google [CloudSQL](https://cloud.google.com/sql) | [Database Flags](https://cloud.google.com/sql/docs/postgres/flags) |
 
-Restart the database in order for the configuration changes to take effect.
 
 ### Create The Datadog User And Grant Permissions
 
