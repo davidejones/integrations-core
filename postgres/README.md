@@ -14,6 +14,13 @@ Get metrics from PostgreSQL in real time to:
 
 The Datadog Agent collects telemetry directly from the database by logging in as a read-only user.
 
+Some setup is required to begin using the PostgreSQL integration:
+
+1. [Install the agent](/account/settings#agent) <!-- side note: this should have RDS/Self-hosted/CloudSQL links-->
+2. [Configure Database Parameters](#database-configuration)
+3. [Create The Datadog User And Grant Permissions](#create-the-datadog-user-and-grant-permissions)
+4. [Configure the Agent](#agent-configuration)
+
 ### Agent Installation
 
 The PostgreSQL check is packaged with the Agent. To start gathering your PostgreSQL metrics and logs, [install the Agent][2].
