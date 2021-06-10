@@ -39,7 +39,7 @@ Configure the following [Postgres parameters](https://www.postgresql.org/docs/13
 
 Restart the database in order for the configuration changes to take effect.
 
-### Agent Database Access
+### Create The Datadog User And Grant Permissions
 
 The datadog agent requires read-only access to the database in order to collect statistics and queries.
 
