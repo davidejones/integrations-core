@@ -435,6 +435,8 @@ instances:
      enabled: true
 ```
 
+Once enabled, visit the [Databases](https://app.datadoghq.com/databases) page to get started!
+
 ## Data Collected
 
 Some of the metrics listed below require additional configuration, see the [sample postgres.d/conf.yaml][3] for all configurable options.
