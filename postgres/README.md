@@ -12,32 +12,34 @@ Get metrics from PostgreSQL in real time to:
 
 ## Setup
 
-### Installation
+### Agent Installation
 
 The PostgreSQL check is packaged with the Agent. To start gathering your PostgreSQL metrics and logs, [install the Agent][2].
 
-### Configuration
-
-#### Postgres parameters
+### Database Configuration
 
 Configure the following [Postgres parameters](https://www.postgresql.org/docs/13/config-setting.html):
 
-```ini
-# Add pg_stats_statements to shared_preload_libraries for collection of query statistics
-shared_preload_libraries = pg_stats_statements
+| Parameter | Value | Description |
+| --- | --- | --- |
+| `shared_preload_libraries` | `pg_stat_statements` | Enable collection of query metrics via the the [pg_stat_statements](https://www.postgresql.org/docs/13/pgstatstatements.html) extension. Required for `postgresql.queries.*` metrics. See [Deep Database Monitoring](#deep-database-monitoring). |
+| `track_activity_query_size` | `4096` | Increase the size of SQL text in `pg_stat_activity` and `pg_stat_statements`. Required for collection of larger queries. If left at the postgres default then queries longer than `1024` characters will not be collected. |
+| `pg_stat_statements.track` | `ALL` | Optional. Enable tracking of statements within stored procedures and functions. |
+| `pg_stat_statements.max` | `10000` | Optional. Increase the number of normalized queries tracked in `pg_stat_statements`. |
 
-# Collect larger query text in pg_stat_activity and pg_stat_statements
-track_activity_query_size = 4096
+##### How to configure
 
-# Collect a wider variety of queries in pg_stat_statements
-pg_stat_statements.max = 10000
-pg_stat_statements.track = ALL
-```
+| Deployment Method | Configuration |
+| --- | --- |
+| Self-hosted | Local `postgresql.conf` file. |
+| AWS [RDS](https://aws.amazon.com/rds/postgresql/) or [RDS Aurora](https://aws.amazon.com/rds/aurora/postgresql-features/) | [DB Parameter Group](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_WorkingWithParamGroups.html) <br/>  Note that for RDS Aurora `pg_stat_statements` is enabled by default. |
+| Google [CloudSQL](https://cloud.google.com/sql) | [Database Flags](https://cloud.google.com/sql/docs/postgres/flags) |
 
-* For self-hosted instances these parameters are configured in `postgresql.conf`
-* For AWS [RDS](https://aws.amazon.com/rds/postgresql/) or [RDS Aurora](https://aws.amazon.com/rds/aurora/postgresql-features/) these parameters are configured through the [DB Parameter Group](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_WorkingWithParamGroups.html)
+Restart the database in order for the configuration changes to take effect.
 
-#### Datadog user setup
+### Agent access setup
+
+The datadog agent requires read-only access to the database in order to collect statistics and queries.
 
 <!-- xxx tabs xxx -->
 <!-- xxx tab "Postgres ≤ 9.6" xxx -->
@@ -48,6 +50,7 @@ CREATE SCHEMA datadog;
 GRANT USAGE ON SCHEMA datadog TO datadog;
 GRANT USAGE ON SCHEMA public TO datadog;
 GRANT SELECT ON pg_stat_database TO datadog;
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 ```
 
 Create functions to enable the agent to read the full contents of `pg_stat_activity` and `pg_stat_statements`:
@@ -73,6 +76,7 @@ CREATE SCHEMA datadog;
 GRANT USAGE ON SCHEMA datadog TO datadog;
 GRANT USAGE ON SCHEMA public TO datadog;
 GRANT pg_monitor TO datadog;
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 ```
 
 <!-- xxz tab xxx -->
@@ -96,13 +100,23 @@ RETURNS NULL ON NULL INPUT
 SECURITY DEFINER;
 ```
 
-To verify the permissions are correct, run the following command:
+To verify the permissions are correct, run the following commands to confirm the agent user is able to connect to the database and read the core tables:
 
 ```shell
-psql -h localhost -U datadog postgres -c \
-"select * from pg_stat_database LIMIT(1);" \
-&& echo -e "\e[0;32mPostgres connection - OK\e[0m" \
-|| echo -e "\e[0;31mCannot connect to Postgres\e[0m"
+psql -h localhost -U datadog postgres -A \
+  -c "select * from pg_stat_database limit 1;" \
+  && echo -e "\e[0;32mPostgres connection - OK\e[0m" \
+  || echo -e "\e[0;31mCannot connect to Postgres\e[0m"
+
+psql -h localhost -U datadog postgres -A \
+  -c "select * from pg_stat_activity limit 1;" \
+  && echo -e "\e[0;32mPostgres pg_stat_activity read OK\e[0m" \
+  || echo -e "\e[0;31mCannot read from pg_stat_activity\e[0m"
+
+psql -h localhost -U datadog postgres -A \
+  -c "select * from pg_stat_statements limit 1;" \
+  && echo -e "\e[0;32mPostgres pg_stat_statements read OK\e[0m" \
+  || echo -e "\e[0;31mCannot read from pg_stat_statements\e[0m"
 ```
 
 When it prompts for a password, enter the one used in the first command.
@@ -401,7 +415,7 @@ Then, [instrument your application container that makes requests to Postgres][32
 
 [Run the Agent's status subcommand][9] and look for `postgres` under the Checks section.
 
-## Deep Database Monitoring (beta)
+## Deep Database Monitoring
 
 <div class="alert alert-warning">
 Deep Database Monitoring is currently in beta.
