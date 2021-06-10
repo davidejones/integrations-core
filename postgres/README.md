@@ -20,7 +20,7 @@ The PostgreSQL check is packaged with the Agent. To start gathering your Postgre
 
 ### Database Configuration
 
-Configure the following [Postgres parameters](https://www.postgresql.org/docs/13/config-setting.html). This is required only for [Deep Database Monitoring](#deep-database-monitoring).
+Configure the following [Postgres parameters](https://www.postgresql.org/docs/13/config-setting.html). These parameters are required only for [Deep Database Monitoring](#deep-database-monitoring). **Note:** a server restart is required for these settings to take effect. For further information on these parameters, please see the [documentation](https://www.postgresql.org/docs/current/pgstatstatements.html).
 
 | Parameter | Value | Description |
 | --- | --- | --- |
