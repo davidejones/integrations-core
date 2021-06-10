@@ -41,7 +41,7 @@ Configure the following [Postgres parameters](https://www.postgresql.org/docs/13
 ### Create The Datadog User And Grant Permissions
 
 The datadog agent requires read-only access to the database in order to collect statistics and queries.
-
+Connect to the **postgres** database and run the following SQL commands with superuser or a user with sufficient permissions to execute these commands. This can be done manually with `[psql](https://www.postgresql.org/docs/current/app-psql.html)` or using any automated configuration you use for managing your databases.
 <!-- xxx tabs xxx -->
 <!-- xxx tab "Postgres ≤ 9.6" xxx -->
 
