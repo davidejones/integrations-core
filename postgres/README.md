@@ -82,7 +82,7 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 <!-- xxz tab xxx -->
 <!-- xxz tabs xxx -->
 
-Create the function to enable the agent to collect execution plans:
+Create the function to enable the agent to collect execution plans. This is required only for [Deep Database Monitoring](#deep-database-monitoring).
 
 ```SQL
 CREATE OR REPLACE FUNCTION datadog.explain_statement (
