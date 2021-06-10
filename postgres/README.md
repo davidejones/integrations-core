@@ -424,7 +424,7 @@ Then, [instrument your application container that makes requests to Postgres][32
 Deep Database Monitoring is currently in beta.
 </div>
 
-Datadog **Deep Database Monitoring** enables collection of Query Metrics, Samples, and Execution plans. To get started, add the `deep_database_monitoring` and `statement_samples` settings to your postgres instance configuration:
+Datadog **Deep Database Monitoring** provides deeper visibility into what is running on your database by collecting per-query Metrics, Query Samples, and Execution Plans. To get started, add the `deep_database_monitoring` and `statement_samples` settings to your PostgreSQL instance configuration:
 
 ```yaml
 instances:
