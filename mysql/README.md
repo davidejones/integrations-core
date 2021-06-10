@@ -4,12 +4,13 @@
 
 ## Overview
 
-The Datadog Agent can collect many metrics from MySQL databases, including (but not limited to):
+The Datadog Agent can collect a variety of telemetry from MySQL databases, including (but not limited to):
 
 - Query throughput
 - Query performance (e.g. average query run time, slow queries, etc.)
 - Connections (e.g. currently open connections, aborted connections, errors, etc.)
 - InnoDB (e.g. buffer pool metrics, etc.)
+- Query Samples & Execution Plans (with [Deep Database Monitoring](#deep-database-monitoring))
 
 You can also create your own metrics using custom SQL queries.
 
@@ -17,27 +18,91 @@ You can also create your own metrics using custom SQL queries.
 
 ## Setup
 
-### Installation
+### Agent Installation
 
 The MySQL check is included in the [Datadog Agent][4] package. No additional installation is needed on your MySQL server.
 
-#### Prepare MySQL
+### Database Configuration
 
-On each MySQL server, create a database user for the Datadog Agent:
+#### Performance Schema
 
-```shell
-mysql> CREATE USER 'datadog'@'localhost' IDENTIFIED BY '<UNIQUEPASSWORD>';
-Query OK, 0 rows affected (0.00 sec)
+In order to collect query metrics, samples, and execution plans for [Deep Database Monitoring](#deep-database-monitoring), the [MySQL Performance Schema](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-quick-start.html) needs to be enabled. 
+
+<!-- xxx tabs xxx -->
+<!-- xxx tab "Self-hosted" -->
+
+Configure the following [Performance Schema Options](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-options.html). They can be configured on the command-line or in option files (i.e. `mysql.conf`). 
+
+| Parameter | Value | Description |
+| --- | --- | --- |
+| `performance_schema` | `ON` |  |
+| `performance-schema-consumer-events-statements-current` | `ON` |  |
+| `performance-schema-consumer-events-statements-history` | `ON` |  |
+| `performance-schema-consumer-events-statements-history-long` | `ON` |  |
+| `performance_schema_max_digest_length` | `4096` |  |
+| `performance_schema_max_sql_text_length` | `4096` |  |
+
+<!-- xxz tab xxx -->
+<!-- xxx tab "Amazon RDS MySQL" xxx -->
+
+Configure the following in the [DB Parameter Group](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithParamGroups.html):
+
+| Parameter | Value | Description |
+| --- | --- | --- |
+| `performance_schema` | `1` |  |
+| `performance_schema_max_digest_length` | `4096` |  |
+| `performance_schema_max_sql_text_length` | `4096` |  |
+
+Note that for RDS MySQL there is no way to configure the `events_statements_*` consumers in the [DB Parameter Group](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithParamGroups.html) so they must enabled dynamically at runtime. See [Agent Database Access](#agent-database-access) for instructions.
+
+<!-- xxz tab xxx -->
+<!-- xxx tab "Amazon RDS Aurora MySQL" xxx -->
+
+Configure the following in the [DB Parameter Group](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_WorkingWithParamGroups.html):
+
+| Parameter | Value | Description |
+| --- | --- | --- |
+| `performance_schema` | `1` |  |
+| `performance_schema_consumer_events_statements_current` | `ON` |  |
+| `performance_schema_consumer_events_statements_history` | `ON` |  |
+| `performance_schema_consumer_events_statements_history_long` | `ON` |  |
+| `performance_schema_max_digest_length` | `4096` |  |
+| `performance_schema_max_sql_text_length` | `4096` |  |
+
+<!-- xxz tab xxx -->
+<!-- xxz tabs xxx -->
+
+### Agent Database Access
+
+The datadog agent requires read-only access to the database in order to collect statistics and queries.
+
+<!-- xxx tabs xxx -->
+<!-- xxx tab "MySQL ≤ 5.7" -->
+
+For managed databases replace `localhost` with the host where your agent will be running, or `%` to allow the agent to connect from any host. For more information, see the [MySQL documentation][5].
+
+```SQL
+CREATE USER 'datadog'@'localhost' IDENTIFIED BY '<UNIQUEPASSWORD>';
+GRANT REPLICATION CLIENT ON *.* TO 'datadog'@'localhost' WITH MAX_USER_CONNECTIONS 5;
+GRANT PROCESS ON *.* TO 'datadog'@'localhost';
+GRANT SELECT ON performance_schema.* TO 'datadog'@'localhost'
 ```
 
-For mySQL 8.0+ create the `datadog` user with the native password hashing method:
+<!-- xxz tab xxx -->
+<!-- xxx tab "MySQL ≥ 8.0" xxx -->
 
-```shell
-mysql> CREATE USER 'datadog'@'localhost' IDENTIFIED WITH mysql_native_password by '<UNIQUEPASSWORD>';
-Query OK, 0 rows affected (0.00 sec)
+For managed databases replace `localhost` with the host where your agent will be running, or `%` to allow the agent to connect from any host. For more information, see the [MySQL documentation][5]. 
+
+```SQL
+CREATE USER 'datadog'@'localhost' IDENTIFIED WITH mysql_native_password by '<UNIQUEPASSWORD>';
+ALTER USER 'datadog'@'localhost' WITH MAX_USER_CONNECTIONS 5;
+GRANT REPLICATION CLIENT ON *.* TO 'datadog'@'localhost'
+GRANT PROCESS ON *.* TO 'datadog'@'localhost';
+GRANT SELECT ON performance_schema.* TO 'datadog'@'localhost'
 ```
 
-**Note**: `@'localhost'` is only for local connections - use the hostname/IP of your Agent for remote connections. For more information, see the [MySQL documentation][5].
+<!-- xxz tab xxx -->
+<!-- xxz tabs xxx -->
 
 Verify the user was created successfully using the following commands - replace `<UNIQUEPASSWORD>` with the password you created above:
 
@@ -51,38 +116,6 @@ echo -e "\033[0;31mCannot connect to MySQL\033[0m"
 mysql -u datadog --password=<UNIQUEPASSWORD> -e "show slave status" && \
 echo -e "\033[0;32mMySQL grant - OK\033[0m" || \
 echo -e "\033[0;31mMissing REPLICATION CLIENT grant\033[0m"
-```
-
-The Agent needs a few privileges to collect metrics. Grant the user the following limited privileges ONLY:
-
-```shell
-mysql> GRANT REPLICATION CLIENT ON *.* TO 'datadog'@'localhost' WITH MAX_USER_CONNECTIONS 5;
-Query OK, 0 rows affected, 1 warning (0.00 sec)
-
-mysql> GRANT PROCESS ON *.* TO 'datadog'@'localhost';
-Query OK, 0 rows affected (0.00 sec)
-```
-
-For MySQL 8.0+ set `max_user_connections` with:
-
-```shell
-mysql> ALTER USER 'datadog'@'localhost' WITH MAX_USER_CONNECTIONS 5;
-Query OK, 0 rows affected (0.00 sec)
-```
-
-If enabled, metrics can be collected from the `performance_schema` database by granting an additional privilege:
-
-```shell
-mysql> show databases like 'performance_schema';
-+-------------------------------+
-| Database (performance_schema) |
-+-------------------------------+
-| performance_schema            |
-+-------------------------------+
-1 row in set (0.00 sec)
-
-mysql> GRANT SELECT ON performance_schema.* TO 'datadog'@'localhost';
-Query OK, 0 rows affected (0.00 sec)
 ```
 
 ### Configuration
@@ -253,6 +286,24 @@ Collecting logs is disabled by default in the Datadog Agent. To enable it, see [
 ### Validation
 
 [Run the Agent's status subcommand][14] and look for `mysql` under the Checks section.
+
+## Deep Database Monitoring
+
+<div class="alert alert-warning">
+Deep Database Monitoring is currently in beta.
+</div>
+
+Datadog **Deep Database Monitoring** enables collection of Query Metrics, Samples, and Execution plans. To get started, add the `deep_database_monitoring` and `statement_samples` settings to your instance configuration:
+
+```yaml
+instances:
+ - server: ""
+   deep_database_monitoring: true
+   statement_samples:
+     enabled: true
+```
+
+Once enabled, visit the [Databases](https://app.datadoghq.com/databases) page to get started!
 
 ## Data Collected
 
