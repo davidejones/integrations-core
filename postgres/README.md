@@ -33,7 +33,7 @@ Configure the following [Postgres parameters](https://www.postgresql.org/docs/13
 
 | Deployment Method | Configuration |
 | --- | --- |
-| Self-hosted | Local `postgresql.conf` file. |
+| Self-hosted | Parameters are configured in your `postgresql.conf` file. More information can be found in the [documentation](https://www.postgresql.org/docs/current/config-setting.html). |
 | AWS [RDS](https://aws.amazon.com/rds/postgresql/) or [RDS Aurora](https://aws.amazon.com/rds/aurora/postgresql-features/) | [DB Parameter Group](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_WorkingWithParamGroups.html) <br/>  Note that for RDS Aurora `pg_stat_statements` is enabled by default. |
 | Google [CloudSQL](https://cloud.google.com/sql) | [Database Flags](https://cloud.google.com/sql/docs/postgres/flags) |
 
