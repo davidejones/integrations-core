@@ -25,7 +25,7 @@ Configure the following [Postgres parameters](https://www.postgresql.org/docs/13
 | Parameter | Value | Description |
 | --- | --- | --- |
 | `shared_preload_libraries` | `pg_stat_statements` | Enable collection of query metrics via the the [pg_stat_statements](https://www.postgresql.org/docs/13/pgstatstatements.html) extension. Required for `postgresql.queries.*` metrics. |
-| `track_activity_query_size` | `4096` | Increase the size of SQL text in `pg_stat_activity` and `pg_stat_statements`. Required for collection of larger queries. If left at the postgres default then queries longer than `1024` characters will not be collected. |
+| `track_activity_query_size` | `4096` | Required for collection of larger queries. Increase the size of SQL text in `pg_stat_activity` and `pg_stat_statements`. If left at the default value then queries longer than `1024` characters will not be collected. |
 | `pg_stat_statements.track` | `ALL` | Optional. Enable tracking of statements within stored procedures and functions. |
 | `pg_stat_statements.max` | `10000` | Optional. Increase the number of normalized queries tracked in `pg_stat_statements`. |
 
