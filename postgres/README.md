@@ -121,7 +121,7 @@ psql -h localhost -U datadog postgres -A \
   || echo -e "\e[0;31mCannot read from pg_stat_statements\e[0m"
 ```
 
-When it prompts for a password, enter the one used in the first command.
+When it prompts for a password, use the password you entered when you created the `datadog` user.
 
 ### Agent Configuration
 
