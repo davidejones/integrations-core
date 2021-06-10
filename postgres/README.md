@@ -18,7 +18,7 @@ The Datadog Agent collects telemetry directly from the database by logging in as
 
 The PostgreSQL check is packaged with the Agent. To start gathering your PostgreSQL metrics and logs, [install the Agent][2].
 
-### Database Configuration
+### Configure Database Parameters
 
 Configure the following [Postgres parameters](https://www.postgresql.org/docs/13/config-setting.html). These parameters are required only for [Deep Database Monitoring](#deep-database-monitoring). **Note:** a server restart is required for these settings to take effect. For further information on these parameters, please see the [documentation](https://www.postgresql.org/docs/current/pgstatstatements.html).
 
