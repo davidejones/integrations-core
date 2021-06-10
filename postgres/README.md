@@ -18,11 +18,11 @@ The PostgreSQL check is packaged with the Agent. To start gathering your Postgre
 
 ### Database Configuration
 
-Configure the following [Postgres parameters](https://www.postgresql.org/docs/13/config-setting.html):
+Configure the following [Postgres parameters](https://www.postgresql.org/docs/13/config-setting.html). This is required only for [Deep Database Monitoring](#deep-database-monitoring).
 
 | Parameter | Value | Description |
 | --- | --- | --- |
-| `shared_preload_libraries` | `pg_stat_statements` | Enable collection of query metrics via the the [pg_stat_statements](https://www.postgresql.org/docs/13/pgstatstatements.html) extension. Required for `postgresql.queries.*` metrics. See [Deep Database Monitoring](#deep-database-monitoring). |
+| `shared_preload_libraries` | `pg_stat_statements` | Enable collection of query metrics via the the [pg_stat_statements](https://www.postgresql.org/docs/13/pgstatstatements.html) extension. Required for `postgresql.queries.*` metrics. |
 | `track_activity_query_size` | `4096` | Increase the size of SQL text in `pg_stat_activity` and `pg_stat_statements`. Required for collection of larger queries. If left at the postgres default then queries longer than `1024` characters will not be collected. |
 | `pg_stat_statements.track` | `ALL` | Optional. Enable tracking of statements within stored procedures and functions. |
 | `pg_stat_statements.max` | `10000` | Optional. Increase the number of normalized queries tracked in `pg_stat_statements`. |
